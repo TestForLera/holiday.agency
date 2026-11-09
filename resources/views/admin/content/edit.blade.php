@@ -1,20 +1,12 @@
-@extends('layots')
-@section('title', 'Контент сайта')
-@section('content')
-<div class="container py-4" style="margin-top:80px;">
-    <div class="d-flex justify-content-between mb-3">
-        <h2>Редактирование контента</h2>
-        <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary btn-sm">← Назад</a>
-    </div>
+@extends('admin.layout')
+@section('admin_title', 'Контент сайта')
+@section('admin_heading', 'Контент главной страницы')
+@section('admin_description', 'Редактируйте главный экран, промокод, тексты и карточки слайдера.')
+@section('admin_content')
 
-    @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
-    @if($errors->any())
-        <div class="alert alert-danger"><ul class="mb-0">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul></div>
-    @endif
-
-    <div class="card mb-4">
-        <div class="card-header"><h5 class="mb-0">Главная страница</h5></div>
-        <div class="card-body">
+    <div class="admin-card mb-4">
+        <div class="admin-card-header"><div><span>Основные настройки</span><h2>Главная страница</h2></div></div>
+        <div class="admin-card-body">
             <form action="{{ route('admin.content.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="row g-3">
@@ -64,9 +56,9 @@
         </div>
     </div>
 
-    <div class="card mb-4">
-        <div class="card-header"><h5 class="mb-0">Слайдер (герои / программы)</h5></div>
-        <div class="card-body">
+    <div class="admin-card mb-4">
+        <div class="admin-card-header"><div><span>Карточки на главной</span><h2>Слайдер героев</h2></div></div>
+        <div class="admin-card-body">
             <h6>Добавить слайд</h6>
             <form action="{{ route('admin.slides.store') }}" method="POST" enctype="multipart/form-data" class="row g-2 mb-4">
                 @csrf
@@ -102,5 +94,4 @@
             @endforeach
         </div>
     </div>
-</div>
 @endsection

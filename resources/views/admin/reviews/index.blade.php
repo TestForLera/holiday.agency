@@ -1,30 +1,27 @@
-@extends('layots')
-@section('title', 'Отзывы')
-@section('content')
-<div class="container py-4" style="margin-top:80px;">
-    <div class="d-flex justify-content-between mb-3">
-        <h2>Отзывы</h2>
-        <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary btn-sm">← Назад</a>
-    </div>
-    @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
-    <div class="card"><div class="card-body">
+@extends('admin.layout')
+@section('admin_title', 'Отзывы')
+@section('admin_heading', 'Отзывы клиентов')
+@section('admin_description', 'Проверяйте обратную связь и удаляйте неподходящие публикации.')
+@section('admin_content')
+    <section class="admin-card">
+    <div class="admin-review-list">
         @forelse($reviews as $review)
-            <div class="border-bottom py-3 d-flex justify-content-between">
-                <div>
-                    <strong>★ {{ $review->rating }}</strong>
-                    — {{ $review->author_name ?? $review->user->name ?? 'Аноним' }}
-                    <div>{{ $review->text }}</div>
-                    <small class="text-muted">{{ $review->created_at?->format('d.m.Y H:i') }}</small>
+            <article class="admin-review-item">
+                <span class="admin-review-avatar">{{ mb_strtoupper(mb_substr($review->author_name ?? $review->user->name ?? 'А', 0, 1)) }}</span>
+                <div class="admin-review-body">
+                    <div class="admin-review-meta"><strong>{{ $review->author_name ?? $review->user->name ?? 'Аноним' }}</strong><span>{{ str_repeat('★', $review->rating) }}</span></div>
+                    <p>{{ $review->text }}</p>
+                    <small>{{ $review->created_at?->format('d.m.Y H:i') }}</small>
                 </div>
                 <form action="{{ route('admin.reviews.destroy', $review) }}" method="POST" onsubmit="return confirm('Удалить отзыв?')">
                     @csrf @method('DELETE')
-                    <button class="btn btn-sm btn-outline-danger">Удалить</button>
+                    <button class="admin-icon-button danger" title="Удалить отзыв"><i class="fas fa-trash"></i></button>
                 </form>
-            </div>
+            </article>
         @empty
             <p class="text-muted">Отзывов нет</p>
         @endforelse
-        {{ $reviews->links() }}
-    </div></div>
-</div>
+    </div>
+    <div class="admin-pagination">{{ $reviews->links() }}</div>
+    </section>
 @endsection

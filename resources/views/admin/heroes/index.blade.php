@@ -1,16 +1,12 @@
-@extends('layots')
-@section('title', 'Герои')
-@section('content')
-<div class="container py-4" style="margin-top:80px;">
-    <div class="d-flex justify-content-between mb-3">
-        <h2>Герои (слайдер / каталог)</h2>
-        <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary btn-sm">← Назад</a>
-    </div>
-    @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
+@extends('admin.layout')
+@section('admin_title', 'Герои')
+@section('admin_heading', 'Герои и персонажи')
+@section('admin_description', 'Добавляйте персонажей, изображения и управляйте их видимостью.')
+@section('admin_content')
 
-    <div class="card mb-4">
-        <div class="card-header">Добавить героя</div>
-        <div class="card-body">
+    <div class="admin-card mb-4">
+        <div class="admin-card-header"><div><span>Новый персонаж</span><h2>Добавить героя</h2></div></div>
+        <div class="admin-card-body">
             <form action="{{ route('admin.heroes.store') }}" method="POST" enctype="multipart/form-data" class="row g-2">
                 @csrf
                 <div class="col-md-3"><input type="text" name="name" class="form-control" placeholder="Имя" required></div>
@@ -25,7 +21,7 @@
     <div class="row g-3">
         @foreach($heroes as $hero)
             <div class="col-md-6">
-                <div class="card h-100">
+                <div class="card h-100 admin-hero-card">
                     <div class="card-body">
                         <form action="{{ route('admin.heroes.update', $hero) }}" method="POST" enctype="multipart/form-data">
                             @csrf @method('PUT')
@@ -57,5 +53,4 @@
             </div>
         @endforeach
     </div>
-</div>
 @endsection

@@ -47,8 +47,15 @@
                 @forelse($slides as $slide)
                     <div class="slide">
                         <div class="slide-content">
-                            <img src="{{ asset($slide->image_path) }}" alt="{{ $slide->title }}">
+                            <img
+                                src="{{ asset($slide->image_path) }}"
+                                alt="{{ $slide->title }}"
+                                onerror="this.onerror=null;this.src='{{ asset('img/1.jpg') }}';"
+                            >
                             <h3>{{ $slide->title }}</h3>
+                            @if(!empty($slide->text))
+                                <p class="slide-description">{{ $slide->text }}</p>
+                            @endif
                         </div>
                     </div>
                 @empty
@@ -65,7 +72,7 @@
 
     <!-- Секция с программами -->
     <section class="programs-section">
-        <h1 class="section-title" id='programm'>НАШИ ПРОГРАММЫ</h1>
+        <h1 class="section-title" id="programs">НАШИ ПРОГРАММЫ</h1>
         <div class="programs-container">
             @forelse($services as $service)
                 <div class="program-card">
@@ -93,7 +100,7 @@
     </section>
 
     <!-- Секция "Почему мы" -->
-    <section class="reasons-section" id="reasons">
+    <section class="reasons-section" id="why-us">
         <h2 class="section-title">ПОЧЕМУ МЫ?</h2>
         <div class="reasons-grid">
             <div class="reason-item">К каждому празднику подбираем индивидуальный подход</div>
@@ -106,7 +113,7 @@
     </section>
 
     <!-- Секция с локациями -->
-    <section class="locations-section">
+    <section class="locations-section" id="locations">
         <div class="locations-container">
             <h2 class="section-title locations-title">ГДЕ МЫ МОЖЕМ ПРОВЕСТИ ПРАЗДНИК</h2>
             <div class="locations-content">
@@ -153,7 +160,7 @@
                         @endfor
                     </div>
 
-                    <p class="review-text">{!! nl2br(e($review->content)) !!}</p>
+                    <p class="review-text">{!! nl2br(e($review->text)) !!}</p>
 
                     @if ($review->photo_url)
                         <img src="{{ asset($review->photo_url) }}" alt="Фото к отзыву" class="review-photo">

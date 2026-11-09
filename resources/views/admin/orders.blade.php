@@ -1,14 +1,12 @@
-@extends('layots')
-@section('title', 'Заявки')
-@section('content')
-<div class="container py-4" style="margin-top:80px;">
-    <div class="d-flex justify-content-between mb-3">
-        <h2>Все заявки</h2>
-        <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary btn-sm">← Назад</a>
-    </div>
-    @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
-    <div class="card"><div class="card-body table-responsive">
-        <table class="table table-sm align-middle">
+@extends('admin.layout')
+@section('admin_title', 'Заявки')
+@section('admin_heading', 'Заявки клиентов')
+@section('admin_description', 'Контакты, детали праздника и текущий этап обработки заказа.')
+@section('admin_content')
+    <section class="admin-card">
+        <div class="admin-card-header"><div><span>Все обращения</span><h2>{{ $orders->total() }} заявок</h2></div></div>
+        <div class="admin-table-wrap">
+        <table class="admin-table admin-orders-table">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -25,8 +23,8 @@
             <tbody>
             @foreach($orders as $order)
                 <tr>
-                    <td>#{{ $order->id }}</td>
-                    <td>{{ $order->fio ?? $order->user->name ?? '—' }}</td>
+                    <td><strong>#{{ $order->id }}</strong></td>
+                    <td><strong>{{ $order->fio ?? $order->user->name ?? '—' }}</strong></td>
                     <td>
                         <small>{{ $order->email ?? $order->user->email ?? '' }}<br>
                         {{ $order->phone ?? $order->user->phone ?? '' }}</small>
@@ -43,9 +41,9 @@
                     <td>{{ $order->address }}@if($order->apartment), кв. {{ $order->apartment }}@endif</td>
                     <td>{{ number_format($order->price ?? 0, 0, '', ' ') }} ₽</td>
                     <td>
-                        <form action="{{ route('admin.orders.update', $order) }}" method="POST">
+                        <form action="{{ route('admin.orders.update', $order) }}" method="POST" class="admin-status-form">
                             @csrf @method('PATCH')
-                            <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <select name="status" class="form-select form-select-sm" onchange="this.form.submit()" aria-label="Статус заявки #{{ $order->id }}">
                                 @foreach(\App\Models\Order::STATUSES as $key => $label)
                                     <option value="{{ $key }}" @selected($order->status === $key)>{{ $label }}</option>
                                 @endforeach
@@ -56,7 +54,7 @@
             @endforeach
             </tbody>
         </table>
-        {{ $orders->links() }}
-    </div></div>
-</div>
+        </div>
+        <div class="admin-pagination">{{ $orders->links() }}</div>
+    </section>
 @endsection

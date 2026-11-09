@@ -8,9 +8,9 @@
     <link rel="icon" href="<?php echo e(asset('img/logo.png')); ?>" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="<?php echo e(asset('css/style.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('css/style.css')); ?>?v=<?php echo e(filemtime(public_path('css/style.css'))); ?>">
 </head>
-<body>
+<body class="<?php echo $__env->yieldContent('body_class'); ?>">
     <!-- Шапка -->
     <header class="main-header fixed-top">
         <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
@@ -59,10 +59,17 @@
                         <?php else: ?>
                             <?php if(auth()->user()->role === 'user'): ?>
                                 <!-- Для обычных пользователей -->
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                                        <i class="fas fa-user-circle"></i> <?php echo e(auth()->user()->name); ?>
-
+                                <li class="nav-item dropdown account-dropdown">
+                                    <a class="nav-link dropdown-toggle account-menu-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span class="account-avatar">
+                                            <?php if(auth()->user()->avatar): ?>
+                                                <img src="<?php echo e(Storage::url(auth()->user()->avatar)); ?>" alt="">
+                                            <?php else: ?>
+                                                <i class="fas fa-user" aria-hidden="true"></i>
+                                            <?php endif; ?>
+                                        </span>
+                                        <span class="account-label"><?php echo e(auth()->user()->name); ?></span>
+                                        <i class="fas fa-chevron-down account-chevron" aria-hidden="true"></i>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end">
                                         <li><a class="dropdown-item" href="<?php echo e(route('cabinet')); ?>">Личный кабинет</a></li>
@@ -77,15 +84,17 @@
                                 </li>
                             <?php elseif(auth()->user()->role === 'admin'): ?>
                                 <!-- Для администратора -->
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
-                                        <i class="fas fa-user-shield"></i> Админ панель
+                                <li class="nav-item dropdown account-dropdown">
+                                    <a class="nav-link dropdown-toggle account-menu-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span class="account-avatar"><i class="fas fa-user-shield" aria-hidden="true"></i></span>
+                                        <span class="account-label">Админ панель</span>
+                                        <i class="fas fa-chevron-down account-chevron" aria-hidden="true"></i>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end">
                                         <li><a class="dropdown-item" href="<?php echo e(route('admin.dashboard')); ?>">Панель управления</a></li>
                                         <li><a class="dropdown-item" href="<?php echo e(route('admin.orders')); ?>">Заявки</a></li>
                                         <li><a class="dropdown-item" href="<?php echo e(route('admin.reviews')); ?>">Отзывы</a></li>
-                                        <li><a class="dropdown-item" href="<?php echo e(route('admin.content.edit')); ?>>Контент</a></li>
+                                        <li><a class="dropdown-item" href="<?php echo e(route('admin.content.edit')); ?>">Контент</a></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li>
                                             <form action="<?php echo e(route('logout')); ?>" method="POST">
@@ -115,10 +124,16 @@
                 <div class="modal-body">
                     <ul class="nav nav-tabs" id="authTab" role="tablist">
                         <li class="nav-item">
-                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#login">Вход</button>
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#login" type="button">
+                                <i class="fas fa-right-to-bracket" aria-hidden="true"></i>
+                                <span>Вход</span>
+                            </button>
                         </li>
                         <li class="nav-item">
-                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#register">Регистрация</button>
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#register" type="button">
+                                <i class="fas fa-user-plus" aria-hidden="true"></i>
+                                <span>Регистрация</span>
+                            </button>
                         </li>
                     </ul>
                     <div class="tab-content mt-3">
@@ -172,7 +187,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <label>Аватар (необязательно)</label>
-                                    <input type="file" name="avatar" class="form-control">
+                                    <input type="file" name="avatar" class="form-control" accept="image/*">
                                 </div>
                                 <button type="submit" class="btn btn-primary w-100">Зарегистрироваться</button>
                             </form>
@@ -215,26 +230,47 @@
         <?php echo $__env->yieldContent('content'); ?>
     </main>
 
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="<?php echo e(asset('img/logo.png')); ?>" alt="Логотип">
+            </div>
+            <div class="footer-contacts">
+                <h3>Контакты</h3>
+                <p>г. Челябинск</p>
+                <p>Тел: 8 (908) 070 33-42</p>
+                <p>Email: info@kukla.ru</p>
+            </div>
+            <div class="footer-social">
+                <h3>Мы в соцсетях</h3>
+                <p>VK | Telegram | WhatsApp</p>
+            </div>
+        </div>
+        <div style="text-align:center; margin-top:20px; font-size:0.9rem;">
+            © 2026 Поздравление ростовой куклы. Все права защищены.
+        </div>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?php echo e(asset('js/app.js')); ?>"></script>
-<?php if($errors->any() && (old('name') || old('phone') || old('password'))): ?>
+    <script src="<?php echo e(asset('js/index.js')); ?>?v=<?php echo e(filemtime(public_path('js/index.js'))); ?>"></script>
+<?php if(session('open_auth') || $errors->has('email') || $errors->has('password') || $errors->has('name') || $errors->has('phone')): ?>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var modal = document.getElementById('authModal');
     if (modal && window.bootstrap) {
-        var tabBtn = document.querySelector('[data-bs-target="#register"]');
-        var regPane = document.getElementById('register');
-        var loginPane = document.getElementById('login');
-        if (tabBtn && regPane) {
-            document.querySelectorAll('#authTab .nav-link').forEach(function(el){ el.classList.remove('active'); });
-            document.querySelectorAll('#authModal .tab-pane').forEach(function(el){ el.classList.remove('show','active'); });
-            tabBtn.classList.add('active');
-            regPane.classList.add('show','active');
-            new bootstrap.Modal(modal).show();
+        var requestedTab = <?php echo json_encode(session('open_auth', old('name') || old('phone') ? 'register' : 'login'), 512) ?>;
+        var tabBtn = document.querySelector('[data-bs-target="#' + requestedTab + '"]');
+
+        if (tabBtn) {
+            bootstrap.Tab.getOrCreateInstance(tabBtn).show();
         }
+
+        bootstrap.Modal.getOrCreateInstance(modal).show();
     }
 });
 </script>
 <?php endif; ?>
 </body>
-</html><?php /**PATH W:\domains\pr_agent-main\resources\views/layots.blade.php ENDPATH**/ ?>
+</html>
+<?php /**PATH /Users/mihailbogatov/study/4course/CourseWorkLera/holiday.agency/resources/views/layots.blade.php ENDPATH**/ ?>

@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\HeroController;
 // Публичные роуты
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/services', [PublicServiceController::class, 'index'])->name('services.index');
+Route::get('/services/{service}/order', [PublicServiceController::class, 'order'])->name('services.order');
 Route::get('/packages', [PublicServiceController::class, 'packages'])->name('packages.index');
 
 // Авторизация
@@ -60,6 +61,6 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::put('/heroes/{hero}', [HeroController::class, 'update'])->name('admin.heroes.update');
     Route::delete('/heroes/{hero}', [HeroController::class, 'destroy'])->name('admin.heroes.destroy');
 
-    Route::resource('services', ServiceController::class)->names('admin.services');
-    Route::resource('packages', PackageController::class)->names('admin.packages');
+    Route::resource('services', ServiceController::class)->only(['index', 'store', 'update', 'destroy'])->names('admin.services');
+    Route::resource('packages', PackageController::class)->only(['index', 'store', 'update', 'destroy'])->names('admin.packages');
 });

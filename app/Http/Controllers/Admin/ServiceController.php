@@ -12,7 +12,7 @@ class ServiceController extends Controller
 {
     public function index()
     {
-        $services = Service::orderBy('order')->get();
+        $services = Service::withCount(['features', 'heroes'])->orderBy('order')->get();
         return view('admin.services.index', compact('services'));
     }
 
@@ -33,6 +33,8 @@ class ServiceController extends Controller
             'is_active' => 'boolean',
             'order' => 'integer'
         ]);
+
+        $validated['is_active'] = $request->boolean('is_active');
 
         $service = Service::create($validated);
 
@@ -81,10 +83,11 @@ class ServiceController extends Controller
             'order' => 'integer'
         ]);
 
+        $validated['is_active'] = $request->boolean('is_active');
         $service->update($validated);
 
-        ServiceFeature::where('service_id', $service->id)->delete();
         if ($request->has('features')) {
+            ServiceFeature::where('service_id', $service->id)->delete();
             foreach ($request->features as $featureText) {
                 if (!empty($featureText)) {
                     ServiceFeature::create([
@@ -95,8 +98,8 @@ class ServiceController extends Controller
             }
         }
 
-        Hero::where('service_id', $service->id)->delete();
         if ($request->has('heroes')) {
+            Hero::where('service_id', $service->id)->delete();
             foreach ($request->heroes as $heroName) {
                 if (!empty($heroName)) {
                     Hero::create([

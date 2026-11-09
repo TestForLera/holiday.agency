@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Service;
 use App\Models\Package;
+use Illuminate\Http\Request;
 
 class PublicServiceController extends Controller
 {
@@ -23,10 +24,24 @@ class PublicServiceController extends Controller
             ->orderBy('order')
             ->get();
 
-        foreach ($packages as $package) {
-            $package->services = Service::findMany(json_decode($package->services_json, true));
+        return view('packages.index', compact('packages'));
+    }
+
+    public function order(Request $request, Service $service)
+    {
+        abort_unless($service->is_active, 404);
+
+        $target = route('cabinet', [
+            'section' => 'order-form',
+            'service' => $service->id,
+        ]);
+
+        if (! auth()->check()) {
+            $request->session()->put('url.intended', $target);
+
+            return redirect('/')->with('open_auth', 'login');
         }
 
-        return view('packages.index', compact('packages'));
+        return redirect($target);
     }
 }

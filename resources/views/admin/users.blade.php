@@ -1,29 +1,28 @@
-@extends('layots')
-@section('title', 'Пользователи')
-@section('content')
-<div class="container py-4" style="margin-top:80px;">
-    <div class="d-flex justify-content-between mb-3">
-        <h2>Пользователи</h2>
-        <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary btn-sm">← Назад</a>
-    </div>
-    <div class="card"><div class="card-body table-responsive">
-        <table class="table">
+@extends('admin.layout')
+@section('admin_title', 'Пользователи')
+@section('admin_heading', 'Пользователи')
+@section('admin_description', 'Контактные данные клиентов и история активности.')
+@section('admin_content')
+    <section class="admin-card">
+        <div class="admin-card-header"><div><span>База клиентов</span><h2>{{ $users->total() }} пользователей</h2></div></div>
+        <div class="admin-table-wrap">
+        <table class="admin-table">
             <thead><tr><th>ID</th><th>Имя</th><th>Email</th><th>Телефон</th><th>Роль</th><th>Заказов</th><th>Регистрация</th></tr></thead>
             <tbody>
             @foreach($users as $user)
                 <tr>
-                    <td>{{ $user->id }}</td>
-                    <td>{{ $user->name }}</td>
+                    <td><strong>#{{ $user->id }}</strong></td>
+                    <td><div class="admin-user-cell"><span class="admin-client-avatar">{{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}</span><strong>{{ $user->name }}</strong></div></td>
                     <td>{{ $user->email }}</td>
                     <td>{{ $user->phone }}</td>
-                    <td>{{ $user->role }}</td>
+                    <td><span class="admin-role role-{{ $user->role }}">{{ $user->role === 'admin' ? 'Администратор' : 'Клиент' }}</span></td>
                     <td>{{ $user->orders_count }}</td>
                     <td>{{ $user->created_at?->format('d.m.Y') }}</td>
                 </tr>
             @endforeach
             </tbody>
         </table>
-        {{ $users->links() }}
-    </div></div>
-</div>
+        </div>
+        <div class="admin-pagination">{{ $users->links() }}</div>
+    </section>
 @endsection

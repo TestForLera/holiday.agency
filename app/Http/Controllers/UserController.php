@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Order;
 use App\Models\Review;
@@ -14,7 +13,7 @@ use App\Models\Service;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
         $orders = Order::with(['package', 'service', 'review'])
@@ -26,6 +25,17 @@ class UserController extends Controller
             ->latest()
             ->get();
         $reviews = Review::where('user_id', $user->id)->latest()->get();
+        $selectedService = null;
+
+        if ($request->filled('service')) {
+            $selectedService = Service::query()
+                ->whereKey($request->integer('service'))
+                ->where('is_active', true)
+                ->first();
+        }
+
+        $expressService = Service::query()->where('title', 'like', '%Экспресс%')->first();
+        $rostovayaPrice = (float) ($expressService?->discounted_price ?? $expressService?->price ?? 2550);
 
         // Heroes lists for form
         $rostovyeHeroes = [
@@ -38,7 +48,16 @@ class UserController extends Controller
             'Игра в кальмара', 'Неон пати'
         ];
 
-        return view('user.cabinet', compact('user', 'orders', 'favorites', 'reviews', 'rostovyeHeroes', 'animHeroes'));
+        return view('user.cabinet', compact(
+            'user',
+            'orders',
+            'favorites',
+            'reviews',
+            'rostovyeHeroes',
+            'animHeroes',
+            'selectedService',
+            'rostovayaPrice'
+        ));
     }
 
     public function updateProfile(Request $request)
@@ -67,21 +86,24 @@ class UserController extends Controller
     public function changePassword(Request $request)
     {
         $validated = $request->validate([
-            'current_password' => 'required',
-            'new_password' => 'required|min:6|confirmed',
+            'current_password' => ['required', 'current_password'],
+            'new_password' => ['required', 'string', 'min:6', 'confirmed', 'different:current_password'],
+        ], [
+            'current_password.current_password' => 'Неверный текущий пароль.',
+            'new_password.min' => 'Новый пароль должен содержать не менее 6 символов.',
+            'new_password.confirmed' => 'Новый пароль и его подтверждение не совпадают.',
+            'new_password.different' => 'Новый пароль должен отличаться от текущего.',
         ]);
 
         $user = auth()->user();
 
-        if (!Hash::check($validated['current_password'], $user->password)) {
-            return back()->withErrors(['current_password' => 'Неверный текущий пароль']);
-        }
+        // The User model's "hashed" cast hashes this value exactly once.
+        $user->password = $validated['new_password'];
+        $user->save();
 
-        $user->update([
-            'password' => Hash::make($validated['new_password']),
-        ]);
-
-        return back()->with('success', 'Пароль изменён!');
+        return redirect()
+            ->route('cabinet', ['section' => 'profile'])
+            ->with('success', 'Пароль успешно изменён!');
     }
 
     public function submitReview(Request $request)
@@ -137,7 +159,32 @@ class UserController extends Controller
             'date' => 'required|date|after_or_equal:today',
             'time' => 'required|string|max:20',
             'comment' => 'nullable|string|max:1000',
+            'service_id' => 'nullable|exists:services,id',
         ]);
+
+        $selectedService = ! empty($validated['service_id'])
+            ? Service::query()->whereKey($validated['service_id'])->where('is_active', true)->first()
+            : null;
+
+        if (! empty($validated['service_id']) && ! $selectedService) {
+            return back()->withErrors(['service_id' => 'Выбранная программа больше недоступна.'])->withInput();
+        }
+
+        if ($selectedService) {
+            $expectedType = $selectedService->id === 1 ? 'rostovaya' : 'animaciya';
+            $expectedDuration = match ($selectedService->duration) {
+                '10–15 минут', '10-15 минут' => '15 минут',
+                '60 минут' => '1 час',
+                '120 минут' => '2 часа',
+                default => $selectedService->duration,
+            };
+
+            if ($validated['hero_type'] !== $expectedType || $validated['duration'] !== $expectedDuration) {
+                return back()->withErrors([
+                    'service_id' => 'Параметры выбранной программы изменились. Выберите программу заново.',
+                ])->withInput();
+            }
+        }
 
         // Check unique date+time
         $exists = Order::where('date', $validated['date'])
@@ -170,7 +217,9 @@ class UserController extends Controller
 
         // Calculate price
         $price = 0;
-        if ($validated['hero_type'] === 'rostovaya') {
+        if ($selectedService) {
+            $price = $selectedService->discounted_price ?? $selectedService->price;
+        } elseif ($validated['hero_type'] === 'rostovaya') {
             $price = 2550; // express with discount base
             $service = Service::where('title', 'like', '%Экспресс%')->first();
             if ($service) {
@@ -196,7 +245,10 @@ class UserController extends Controller
                 $addPrice += 700;
             }
         }
-        if (in_array('neon', $additional) || in_array('serebro', $additional)) {
+        if (in_array('neon', $additional)) {
+            $addPrice += 1000;
+        }
+        if (in_array('serebro', $additional)) {
             $addPrice += 1000;
         }
         if (in_array('express', $additional) && $validated['hero_type'] === 'animaciya') {
@@ -222,9 +274,12 @@ class UserController extends Controller
             'comment' => $validated['comment'] ?? null,
             'status' => 'oformlenie',
             'price' => $price,
+            'service_id' => $selectedService?->id,
         ]);
 
-        return back()->with('success', 'Заявка успешно отправлена! Номер заявки: #' . $order->id);
+        return redirect()
+            ->route('cabinet', ['section' => 'orders'])
+            ->with('success', 'Заявка успешно отправлена! Номер заявки: #' . $order->id);
     }
 
     public function toggleFavorite(Request $request)

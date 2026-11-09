@@ -45,8 +45,15 @@
                 <?php $__empty_1 = true; $__currentLoopData = $slides; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $slide): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <div class="slide">
                         <div class="slide-content">
-                            <img src="<?php echo e(asset($slide->image_path)); ?>" alt="<?php echo e($slide->title); ?>">
+                            <img
+                                src="<?php echo e(asset($slide->image_path)); ?>"
+                                alt="<?php echo e($slide->title); ?>"
+                                onerror="this.onerror=null;this.src='<?php echo e(asset('img/1.jpg')); ?>';"
+                            >
                             <h3><?php echo e($slide->title); ?></h3>
+                            <?php if(!empty($slide->text)): ?>
+                                <p class="slide-description"><?php echo e($slide->text); ?></p>
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
@@ -63,18 +70,25 @@
 
     <!-- Секция с программами -->
     <section class="programs-section">
-        <h1 class="section-title" id='programm'>НАШИ ПРОГРАММЫ</h1>
+        <h1 class="section-title" id="programs">НАШИ ПРОГРАММЫ</h1>
         <div class="programs-container">
-            <?php $__empty_1 = true; $__currentLoopData = $items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+            <?php $__empty_1 = true; $__currentLoopData = $services; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <div class="program-card">
                     <div class="program-image-wrapper">
-                        <img src="<?php echo e(asset($item->photo_url)); ?>" alt="<?php echo e($item->name); ?>" class="program-image">
+                        <img src="<?php echo e(asset('img/1.jpg')); ?>" alt="<?php echo e($service->title); ?>" class="program-image">
                     </div>
                     <div class="program-content">
-                        <h3 class="program-title"><?php echo e($item->name); ?></h3>
-                        <p class="program-description"><?php echo e($item->description); ?></p>
-                        <p class="program-price">от <?php echo e($item->price); ?> ₽</p>
-                        <a href="<?php echo e(route('program.detail', $item->id)); ?>" class="btn-more">Подробнее</a>
+                        <h3 class="program-title"><?php echo e($service->title); ?></h3>
+                        <p class="program-description"><?php echo e(\Illuminate\Support\Str::limit($service->description, 120)); ?></p>
+                        <p class="program-price">
+                            <?php if($service->discounted_price): ?>
+                                <s><?php echo e(number_format($service->price, 0, '', ' ')); ?> ₽</s>
+                                <?php echo e(number_format($service->discounted_price, 0, '', ' ')); ?> ₽
+                            <?php else: ?>
+                                от <?php echo e(number_format($service->price, 0, '', ' ')); ?> ₽
+                            <?php endif; ?>
+                        </p>
+                        <a href="<?php echo e(route('services.index')); ?>" class="btn-more">Подробнее</a>
                     </div>
                 </div>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
@@ -84,7 +98,7 @@
     </section>
 
     <!-- Секция "Почему мы" -->
-    <section class="reasons-section" id="reasons">
+    <section class="reasons-section" id="why-us">
         <h2 class="section-title">ПОЧЕМУ МЫ?</h2>
         <div class="reasons-grid">
             <div class="reason-item">К каждому празднику подбираем индивидуальный подход</div>
@@ -97,7 +111,7 @@
     </section>
 
     <!-- Секция с локациями -->
-    <section class="locations-section">
+    <section class="locations-section" id="locations">
         <div class="locations-container">
             <h2 class="section-title locations-title">ГДЕ МЫ МОЖЕМ ПРОВЕСТИ ПРАЗДНИК</h2>
             <div class="locations-content">
@@ -144,7 +158,7 @@
                         <?php endfor; ?>
                     </div>
 
-                    <p class="review-text"><?php echo nl2br(e($review->content)); ?></p>
+                    <p class="review-text"><?php echo nl2br(e($review->text)); ?></p>
 
                     <?php if($review->photo_url): ?>
                         <img src="<?php echo e(asset($review->photo_url)); ?>" alt="Фото к отзыву" class="review-photo">
@@ -171,4 +185,4 @@
     </div>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layots', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH W:\domains\pr_agent-main\resources\views/index.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layots', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /Users/mihailbogatov/study/4course/CourseWorkLera/holiday.agency/resources/views/index.blade.php ENDPATH**/ ?>

@@ -19,7 +19,7 @@ class DashboardController extends Controller
             'totalReviews' => Review::count(),
         ];
 
-        $recentOrders = Order::with(['user', 'package'])->latest()->take(10)->get();
+        $recentOrders = Order::with(['user', 'package', 'service'])->latest()->take(10)->get();
         $users = User::where('role', 'user')->latest()->take(20)->get();
 
         return view('admin.dashboard', compact('stats', 'recentOrders', 'users'));

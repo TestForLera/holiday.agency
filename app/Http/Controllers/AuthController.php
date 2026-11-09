@@ -25,7 +25,7 @@ class AuthController extends Controller
                 return redirect()->route('admin.dashboard');
             }
 
-            return redirect()->route('cabinet');
+            return redirect()->intended(route('cabinet'));
         }
 
         return back()->withErrors([
@@ -66,7 +66,7 @@ class AuthController extends Controller
 
             Auth::login($user);
 
-            return redirect()->route('cabinet')->with('success', 'Регистрация успешна!');
+            return redirect()->intended(route('cabinet'))->with('success', 'Регистрация успешна!');
         } catch (Throwable $e) {
             Log::error('Register failed: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),

@@ -35,7 +35,8 @@ class PackageController extends Controller
             'order' => 'integer'
         ]);
 
-        $validated['services_json'] = json_encode($request->services_json);
+        $validated['services_json'] = $request->input('services_json', []);
+        $validated['is_active'] = $request->boolean('is_active');
 
         Package::create($validated);
 
@@ -46,7 +47,6 @@ class PackageController extends Controller
     public function edit(Package $package)
     {
         $services = Service::where('is_active', true)->get();
-        $package->services_json = json_decode($package->services_json, true);
         return view('admin.packages.edit', compact('package', 'services'));
     }
 
@@ -63,7 +63,8 @@ class PackageController extends Controller
             'order' => 'integer'
         ]);
 
-        $validated['services_json'] = json_encode($request->services_json);
+        $validated['services_json'] = $request->input('services_json', []);
+        $validated['is_active'] = $request->boolean('is_active');
 
         $package->update($validated);
 

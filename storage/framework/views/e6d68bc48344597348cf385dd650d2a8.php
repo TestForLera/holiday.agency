@@ -1,0 +1,1 @@
+<?php /**PATH /Users/mihailbogatov/study/4course/CourseWorkLera/holiday.agency/resources/views/basket/index.blade.php ENDPATH**/ ?>

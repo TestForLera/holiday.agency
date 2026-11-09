@@ -1,19 +1,11 @@
-<?php $__env->startSection('title', 'Контент сайта'); ?>
-<?php $__env->startSection('content'); ?>
-<div class="container py-4" style="margin-top:80px;">
-    <div class="d-flex justify-content-between mb-3">
-        <h2>Редактирование контента</h2>
-        <a href="<?php echo e(route('admin.dashboard')); ?>" class="btn btn-outline-secondary btn-sm">← Назад</a>
-    </div>
+<?php $__env->startSection('admin_title', 'Контент сайта'); ?>
+<?php $__env->startSection('admin_heading', 'Контент главной страницы'); ?>
+<?php $__env->startSection('admin_description', 'Редактируйте главный экран, промокод, тексты и карточки слайдера.'); ?>
+<?php $__env->startSection('admin_content'); ?>
 
-    <?php if(session('success')): ?><div class="alert alert-success"><?php echo e(session('success')); ?></div><?php endif; ?>
-    <?php if($errors->any()): ?>
-        <div class="alert alert-danger"><ul class="mb-0"><?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $e): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><li><?php echo e($e); ?></li><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?></ul></div>
-    <?php endif; ?>
-
-    <div class="card mb-4">
-        <div class="card-header"><h5 class="mb-0">Главная страница</h5></div>
-        <div class="card-body">
+    <div class="admin-card mb-4">
+        <div class="admin-card-header"><div><span>Основные настройки</span><h2>Главная страница</h2></div></div>
+        <div class="admin-card-body">
             <form action="<?php echo e(route('admin.content.update')); ?>" method="POST" enctype="multipart/form-data">
                 <?php echo csrf_field(); ?>
                 <div class="row g-3">
@@ -63,9 +55,9 @@
         </div>
     </div>
 
-    <div class="card mb-4">
-        <div class="card-header"><h5 class="mb-0">Слайдер (герои / программы)</h5></div>
-        <div class="card-body">
+    <div class="admin-card mb-4">
+        <div class="admin-card-header"><div><span>Карточки на главной</span><h2>Слайдер героев</h2></div></div>
+        <div class="admin-card-body">
             <h6>Добавить слайд</h6>
             <form action="<?php echo e(route('admin.slides.store')); ?>" method="POST" enctype="multipart/form-data" class="row g-2 mb-4">
                 <?php echo csrf_field(); ?>
@@ -101,7 +93,6 @@
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>
-</div>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layots', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH W:\domains\laravel-project-fixed\new-repo\resources\views/admin/content/edit.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('admin.layout', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /Users/mihailbogatov/study/4course/CourseWorkLera/holiday.agency/resources/views/admin/content/edit.blade.php ENDPATH**/ ?>

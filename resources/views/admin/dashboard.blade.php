@@ -1,97 +1,81 @@
-@extends('layots')
+@extends('admin.layout')
 
-@section('title', 'Админ панель')
+@section('admin_title', 'Обзор')
+@section('admin_heading', 'Добро пожаловать!')
+@section('admin_description', 'Краткая сводка по сайту и последние действия клиентов.')
 
-@section('content')
-<div class="container-fluid py-4" style="margin-top: 80px;">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Панель управления</h2>
-        <div class="btn-group">
-            <a href="{{ route('admin.users') }}" class="btn btn-outline-primary btn-sm">Пользователи</a>
-            <a href="{{ route('admin.orders') }}" class="btn btn-outline-primary btn-sm">Заказы</a>
-            <a href="{{ route('admin.reviews') }}" class="btn btn-outline-primary btn-sm">Отзывы</a>
-            <a href="{{ route('admin.content.edit') }}" class="btn btn-outline-primary btn-sm">Контент</a>
-            <a href="{{ route('admin.heroes.index') }}" class="btn btn-outline-primary btn-sm">Герои</a>
-        </div>
+@section('admin_content')
+    <div class="admin-stats-grid">
+        <a href="{{ route('admin.users') }}" class="admin-stat-card stat-blue">
+            <span class="admin-stat-icon"><i class="fas fa-users"></i></span>
+            <span><small>Пользователи</small><strong>{{ $stats['totalUsers'] }}</strong><em>Все клиенты</em></span>
+            <i class="fas fa-arrow-right admin-stat-arrow"></i>
+        </a>
+        <a href="{{ route('admin.orders') }}" class="admin-stat-card stat-green">
+            <span class="admin-stat-icon"><i class="fas fa-clipboard-check"></i></span>
+            <span><small>Всего заявок</small><strong>{{ $stats['totalOrders'] }}</strong><em>За всё время</em></span>
+            <i class="fas fa-arrow-right admin-stat-arrow"></i>
+        </a>
+        <a href="{{ route('admin.orders') }}" class="admin-stat-card stat-orange">
+            <span class="admin-stat-icon"><i class="fas fa-clock"></i></span>
+            <span><small>Требуют внимания</small><strong>{{ $stats['pendingOrders'] }}</strong><em>Новые и в работе</em></span>
+            <i class="fas fa-arrow-right admin-stat-arrow"></i>
+        </a>
+        <a href="{{ route('admin.reviews') }}" class="admin-stat-card stat-pink">
+            <span class="admin-stat-icon"><i class="fas fa-star"></i></span>
+            <span><small>Отзывы</small><strong>{{ $stats['totalReviews'] }}</strong><em>Опубликовано</em></span>
+            <i class="fas fa-arrow-right admin-stat-arrow"></i>
+        </a>
     </div>
 
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white"><div class="card-body">
-                <h6>Пользователи</h6><h2>{{ $stats['totalUsers'] }}</h2>
-            </div></div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white"><div class="card-body">
-                <h6>Всего заказов</h6><h2>{{ $stats['totalOrders'] }}</h2>
-            </div></div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-dark"><div class="card-body">
-                <h6>Ожидают</h6><h2>{{ $stats['pendingOrders'] }}</h2>
-            </div></div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white"><div class="card-body">
-                <h6>Отзывы</h6><h2>{{ $stats['totalReviews'] }}</h2>
-            </div></div>
-        </div>
+    <div class="admin-quick-actions">
+        <a href="{{ route('admin.services.index') }}"><i class="fas fa-plus"></i><span><strong>Добавить программу</strong><small>Цены и описание</small></span></a>
+        <a href="{{ route('admin.heroes.index') }}"><i class="fas fa-masks-theater"></i><span><strong>Добавить героя</strong><small>Каталог персонажей</small></span></a>
+        <a href="{{ route('admin.content.edit') }}"><i class="fas fa-pen-to-square"></i><span><strong>Изменить главную</strong><small>Тексты и слайдер</small></span></a>
     </div>
 
-    <div class="row">
-        <div class="col-lg-8 mb-4">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between">
-                    <h5 class="mb-0">Последние заказы</h5>
-                    <a href="{{ route('admin.orders') }}">Все</a>
-                </div>
-                <div class="card-body table-responsive">
-                    <table class="table table-sm">
-                        <thead><tr><th>ID</th><th>Клиент</th><th>Дата</th><th>Статус</th><th></th></tr></thead>
-                        <tbody>
-                        @foreach($recentOrders as $order)
-                            <tr>
-                                <td>{{ $order->id }}</td>
-                                <td>{{ $order->user->name ?? '—' }}</td>
-                                <td>{{ $order->date?->format('d.m.Y') }}</td>
-                                <td>
-                                    <form action="{{ route('admin.orders.update', $order) }}" method="POST">
-                                        @csrf @method('PATCH')
-                                        <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
-                                            @foreach(\App\Models\Order::STATUSES as $key => $label)
-                                                <option value="{{ $key }}" @selected($order->status === $key)>{{ $label }}</option>
-                                            @endforeach
-                                        </select>
-                                    </form>
-                                </td>
-                                <td>{{ $order->package->title ?? '—' }}</td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
-                </div>
+    <div class="admin-dashboard-grid">
+        <section class="admin-card admin-orders-card">
+            <div class="admin-card-header">
+                <div><span>Последние события</span><h2>Новые заявки</h2></div>
+                <a href="{{ route('admin.orders') }}">Смотреть все <i class="fas fa-arrow-right"></i></a>
             </div>
-        </div>
-        <div class="col-lg-4 mb-4">
-            <div class="card">
-                <div class="card-header"><h5 class="mb-0">Пользователи</h5></div>
-                <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        @foreach($users as $u)
-                            <li class="list-group-item px-0 d-flex justify-content-between">
-                                <span>{{ $u->name }} <small class="text-muted">{{ $u->email }}</small></span>
-                                <small>{{ $u->phone }}</small>
-                            </li>
-                        @endforeach
-                    </ul>
-                    <a href="{{ route('admin.users') }}" class="btn btn-sm btn-outline-secondary mt-2">Все пользователи</a>
-                </div>
+            <div class="admin-table-wrap">
+                <table class="admin-table">
+                    <thead><tr><th>Заявка</th><th>Клиент</th><th>Дата</th><th>Программа</th><th>Статус</th></tr></thead>
+                    <tbody>
+                    @forelse($recentOrders as $order)
+                        <tr>
+                            <td><strong>#{{ $order->id }}</strong></td>
+                            <td><strong>{{ $order->fio ?? $order->user->name ?? 'Без имени' }}</strong><small>{{ $order->phone ?? $order->user->phone ?? '' }}</small></td>
+                            <td>{{ $order->date?->format('d.m.Y') }}<small>{{ $order->time }}</small></td>
+                            <td>{{ $order->service->title ?? $order->hero_name ?? '—' }}</td>
+                            <td><span class="admin-status status-{{ $order->status }}">{{ $order->status_label }}</span></td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="5"><div class="admin-empty">Заявок пока нет</div></td></tr>
+                    @endforelse
+                    </tbody>
+                </table>
             </div>
-        </div>
+        </section>
+
+        <section class="admin-card admin-clients-card">
+            <div class="admin-card-header">
+                <div><span>Недавно зарегистрировались</span><h2>Новые клиенты</h2></div>
+                <a href="{{ route('admin.users') }}">Все</a>
+            </div>
+            <div class="admin-client-list">
+                @forelse($users->take(6) as $user)
+                    <div class="admin-client-item">
+                        <span class="admin-client-avatar">{{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}</span>
+                        <span><strong>{{ $user->name }}</strong><small>{{ $user->email }}</small></span>
+                        <small>{{ $user->created_at?->format('d.m') }}</small>
+                    </div>
+                @empty
+                    <div class="admin-empty">Пользователей пока нет</div>
+                @endforelse
+            </div>
+        </section>
     </div>
-</div>
 @endsection
